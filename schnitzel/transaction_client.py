@@ -32,7 +32,7 @@ class TransactionClient(object):
     # request_message is a dict (key = field name)
     def send_request(self, request_message: dict) -> dict:
         if self.log_game:
-            self.message_log.append((0, request_message))
+            self.message_log.append(('Schnitzel Bot', request_message))
         request_bytes = json.dumps(request_message).encode('utf-8')
 
         # Send the request
@@ -42,7 +42,7 @@ class TransactionClient(object):
 
         return self.receive_response()
 
-    def receive_response(self) -> dict:
+    def receive_response(self) -> dict or None:
         # Receive data from the server and shut down
         response_length_bytes = self.sock.recv(4)
         response_length = int.from_bytes(response_length_bytes, 'little')
@@ -54,7 +54,7 @@ class TransactionClient(object):
         received_dict = json.loads(received_json)
 
         if self.log_game:
-            self.message_log.append((1, received_dict))
+            self.message_log.append(('Server', received_dict))
         return received_dict
 
     #####
