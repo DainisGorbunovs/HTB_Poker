@@ -1,16 +1,22 @@
 import json
 from schnitzel import TransactionClient
 
-client = TransactionClient()
 
+client = TransactionClient(log_game=True)
 # Client login
 login_response = client.login()
 
-# Begin hand
+# Begin hand (repeated)
 auction = client.receive_response()
 
 auction_result = client.auction_response()
 
 status = client.receive_response()
 
-print(json.dumps(login_response, indent=4, sort_keys=True))
+# Bet sequence (repeated until check/call/fold/raise)
+bet = client.receive_response()
+
+client.bet_response()
+
+client.close()
+

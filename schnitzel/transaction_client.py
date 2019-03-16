@@ -1,23 +1,38 @@
 import socket
 import json
+import uuid
+import os
 
 HOST, PORT = "35.197.236.148", 9877
 
 
 class TransactionClient(object):
-    def __init__(self):
+    def __init__(self, log_game: bool = False):
         # Create a socket (SOCK_STREAM means a TCP socket)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
         # Connect to server and send data
         self.sock.connect((HOST, PORT))
 
+        self.log_game = log_game
+        self.message_log = []
+
     # close sock when destructor is ran
-    def __del__(self):
+    def close(self):
         self.sock.close()
+        # Save to a game with a unique UUID.json
+        filename = 'games/' + str(uuid.uuid4()) + '.json'
+
+        if not os.path.exists('games'):
+            os.makedirs('games')
+
+        with open(filename, 'w') as outfile:
+            json.dump(self.message_log, outfile)
 
     # request_message is a dict (key = field name)
     def send_request(self, request_message: dict) -> dict:
+        if self.log_game:
+            self.message_log.append((0, request_message))
         request_bytes = json.dumps(request_message).encode('utf-8')
 
         # Send the request
@@ -27,7 +42,7 @@ class TransactionClient(object):
 
         return self.receive_response()
 
-    def receive_response(self):
+    def receive_response(self) -> dict:
         # Receive data from the server and shut down
         response_length_bytes = self.sock.recv(4)
         response_length = int.from_bytes(response_length_bytes, 'little')
@@ -37,9 +52,15 @@ class TransactionClient(object):
 
         received_json = str(self.sock.recv(response_length), 'utf-8')
         received_dict = json.loads(received_json)
+
+        if self.log_game:
+            self.message_log.append((1, received_dict))
         return received_dict
 
-    def login(self, tournament: bool = False, player: str = 'schnitzel'):
+    #####
+    # Texas Holdem commands
+    #####
+    def login(self, tournament: bool = False, player: str = 'schnitzel') -> dict:
         return self.send_request({
             # Always “login”
             'type': 'login',
@@ -51,7 +72,8 @@ class TransactionClient(object):
             'tournament': tournament
         })
 
-    def auction_response(self, token: int = 0, super_power: str = None, bid: int = 0):
+    def auction_response(self, token: int = 0, super_power: str = None,
+                         bid: int = 0) -> dict:
         response = {
             # Always “auction_response”
             'type': 'auction_response',
@@ -70,6 +92,7 @@ class TransactionClient(object):
 
         return self.send_request(response)
 
+    # server replies back, if we use a superpower
     def bet_response(self, token: int = 0, action: str = 'fold',
                      stake: int = None, use_reserve: bool = False):
         response = {
@@ -93,4 +116,6 @@ class TransactionClient(object):
             # to raise by (excluding the chips required to call).
             response['stake'] = stake
 
-        return self.send_request(response)
+        # if action is a superpower
+        if action in ['spy', 'seer', 'leech']:
+            return self.send_request(response)
