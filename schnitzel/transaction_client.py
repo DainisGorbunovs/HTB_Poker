@@ -94,7 +94,7 @@ class TransactionClient(object):
 
     # server replies back, if we use a superpower
     def bet_response(self, token: int = 0, action: str = 'fold',
-                     stake: int = None, use_reserve: bool = False):
+                     stake: int = 0, use_reserve: bool = False) -> dict or None:
         response = {
             # Always “bet_response”
             'type': 'bet_response',
@@ -105,6 +105,8 @@ class TransactionClient(object):
             # Either a game action (check, call, raise, fold)
             # or a super power to use (spy, seer, leech)
             'action': action,
+
+            'stake': stake,
 
             # True to allow use of reserve chips or super powers if
             # the main counts are insufficient
@@ -119,3 +121,5 @@ class TransactionClient(object):
         # if action is a superpower
         if action in ['spy', 'seer', 'leech']:
             return self.send_request(response)
+
+        return None
