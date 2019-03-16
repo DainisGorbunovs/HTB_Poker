@@ -15,4 +15,4 @@ class RandomWalk(object):
     # bet_response
     def make_a_bet(self):
         # action, stake, use_reserve
-        return 'call', 0, False
+        return 'raise', 800, False

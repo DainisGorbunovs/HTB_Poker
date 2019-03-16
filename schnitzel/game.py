@@ -54,7 +54,8 @@ class Game(object):
                 action, stake, use_reserve = self.strategy.make_a_bet()
                 client.bet_response(token, action, stake, use_reserve)
 
-                # if action in ['check', 'call', 'fold', 'raise']:
-                #     bet_sequence = False
+                # if action is a superpower
+                if action in ['spy', 'seer', 'leech']:
+                    superpower_response = client.receive_response()
 
         client.close()

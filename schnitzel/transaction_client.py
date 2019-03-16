@@ -106,8 +106,6 @@ class TransactionClient(object):
             # or a super power to use (spy, seer, leech)
             'action': action,
 
-            'stake': stake,
-
             # True to allow use of reserve chips or super powers if
             # the main counts are insufficient
             'use_reserve': use_reserve
@@ -118,8 +116,4 @@ class TransactionClient(object):
             # to raise by (excluding the chips required to call).
             response['stake'] = stake
 
-        # if action is a superpower
-        if action in ['spy', 'seer', 'leech']:
-            return self.send_request(response)
-
-        return None
+        return self.send_request(response)
