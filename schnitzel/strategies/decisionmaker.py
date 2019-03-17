@@ -91,6 +91,31 @@ def overallScore(community, hand, stakePercent):
     return playerScore(community, hand) / communityScore(community) * risk
 
 
+def auctionSuperpower(superpowers):
+    if superpowers["leech"] == 0:
+        return ["leech", 8]
+    elif superpowers["spy"] == 0:
+        return ["spy", 8]
+    elif superpowers["leech"] < 3:
+        return ["leech", 4]
+    elif superpowers["spy"] < 3:
+        return ["spy", 4]
+    else:
+        return ["none", 0]
+
+
+def useSuperpower(superpowers, hand, community, stake, currentMoney):
+    if stake < 0.1 * currentMoney:
+        return "none"
+    else:
+        pScore = playerScore(community, hand)
+        if pScore < 0.2 and superpowers["spy"] != 0:
+            return "spy"
+        elif pScore < 0.5 and superpowers["leech"] != 0:
+            return "leech"
+        else:
+            return "none"
+
 
 # method makes a decision (check/raise/call/fold) based on:
 #   @community, the cards on the board
