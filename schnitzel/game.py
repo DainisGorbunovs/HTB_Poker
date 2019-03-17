@@ -8,19 +8,44 @@ class Game(object):
     def __init__(self, strategy: object, tournament: bool = False):
         logging.basicConfig(level=logging.DEBUG)
         self.strategy = strategy
-        self.strategy.attach_game(self)
         self.login_response = None
         self.tournament = tournament
         self.client = None
         self.status = []
+        self.superpowers = {}
+        self.strategy.attach_game(self)
 
     def run(self):
         client = TransactionClient(log_game=True)
         self.client = client
         # Client login
         self.login_response = client.login(tournament=self.tournament)
+        self.superpowers = self.login_response['superPowers']
+        begin_chips = self.login_response['chips']
+        blinds_initial_value = self.login_response['blinds']['initialValue']
+        stable_hand_count = self.login_response['blinds']['stableHandCount']
+        growth_rate = self.login_response['blinds']['growthRate']
+        seer = self.superpowers['seer']
+        spy = self.superpowers['spy']
+        leech = self.superpowers['leech']
+
+        reserve_seer = self.login_response['superPowersReserve']['seer']
+        reserve_spy = self.login_response['superPowersReserve']['spy']
+        reserve_leech = self.login_response['superPowersReserve']['leech']
+
+        reserve_chips = self.login_response['chipsReserve']
+        tournaments_scores = self.login_response['tournamentsScores']
+
+        logging.debug(f'LOGIN_RESPONSE: chips: {begin_chips}, blinds (value: {blinds_initial_value}, '
+                      f'stable hand count: {stable_hand_count}, growth rate: {growth_rate})')
+        logging.debug(f'Superpowers: {seer} seer, {spy} spy, {leech} leech. '
+                      f'Reserved: {reserve_seer} seer, {reserve_spy} spy, {reserve_leech} leech.')
+        logging.debug(f'{reserve_chips} reserve chips, {tournaments_scores} tournaments scores.')
+
         schnitzel_user = self.login_response['playerId']
         logging.debug(f'We are {schnitzel_user}')
+
+
 
         total_chips = None
         begin_hand = True
@@ -53,6 +78,7 @@ class Game(object):
 
                 if response['type'] == 'status':
                     self.status.append(response)
+                    self.superpowers = response['superPowers']
                     current_player, stake, pot = response['currentPlayer'], int(response['stake']), response['pot']
                     current_player = 'SCHNITZEL BOT' if current_player == schnitzel_user else current_player
                     community_cards = CardConvert.convert_cards(response['communityCards'])

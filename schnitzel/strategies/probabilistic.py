@@ -11,8 +11,12 @@ class Probabilistic(object):
     def attach_game(self, game: Game):
         self.game = game
 
+    def get_superpowers(self) -> dict:
+        return self.game.superpowers
+
     # auction_response
     def superpower_bid(self):
+
         return None, 0
 
     # bet_response
