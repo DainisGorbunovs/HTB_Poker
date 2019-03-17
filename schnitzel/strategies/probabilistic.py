@@ -53,10 +53,14 @@ class Probabilistic(object):
             community.append(Card.new(card_name))
 
         schnitzel_chips = self.game.get_schnitzel_chips()
-        use_superpower = useSuperpower(self.get_superpowers(), hand, community, int(latest_status['stake']), schnitzel_chips)
-        if use_superpower is not None:
-            self.game.superpowers[use_superpower] -= 1
-            return use_superpower, 0, False
+        try:
+            use_superpower = useSuperpower(self.get_superpowers(), hand, community, int(latest_status['stake']), schnitzel_chips)
+            if use_superpower is not None:
+                self.game.superpowers[use_superpower] -= 1
+                return use_superpower, 0, False
+        except Exception:
+            pass
+
 
         # community = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
         # hand = [Card.new('4s'), Card.new('Jc')]
