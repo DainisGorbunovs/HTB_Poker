@@ -110,8 +110,8 @@ def decision(community, hand, bidAmount, currentMoney):
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
     print("The score for this hand is: %8f" % score)
-    if score < 0.4:
-        betValue = 0.3 * currentMoney
+    if score < 0.25:
+        betValue = 0.7 * currentMoney
         if betValue > bidAmount:
             return ["raise", int(betValue - bidAmount)]
         else:
@@ -119,8 +119,17 @@ def decision(community, hand, bidAmount, currentMoney):
                 return ["check", 0]
             else:
                 return ["call", 0]
-    elif score < 0.6:
-        betValue = 0.1 * currentMoney
+    elif score < 0.4:
+        betValue = 0.4 * currentMoney
+        if betValue > bidAmount:
+            return ["raise", int(betValue - bidAmount)]
+        else:
+            if bidAmount == 0:
+                return ["check", 0]
+            else:
+                return ["call", 0]
+    elif score < 0.62:
+        betValue = 0.15 * currentMoney
         if betValue > bidAmount:
             return ["raise", int(betValue - bidAmount)]
         else:
@@ -129,24 +138,19 @@ def decision(community, hand, bidAmount, currentMoney):
             else:
                 return ["call", 0]
     elif score < 0.9:
-        betValue = 0.1 * 0.75 * currentMoney
+        betValue = 0.04 * currentMoney
         if betValue > bidAmount:
-            return ["raise", int((betValue - bidAmount))]
-        else:
-            if bidAmount == 0:
-                return ["check", 0]
-            else:
+            if bidAmount != 0:
                 return ["call", 0]
-    else:
-        betValue = 0.05 * currentMoney
-        if betValue >= bidAmount:
-            if bidAmount == 0:
-                return ["check", 0]
             else:
-                return ["call", 0]
+                return ["check", 0]
         else:
             return ["fold", 0]
-
+    else:
+        if bidAmount == 0:
+            return ["check", 0]
+        else:
+            return ["fold", 0]
 
 
 if __name__ == "__main__":

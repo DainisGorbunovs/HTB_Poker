@@ -114,10 +114,11 @@ class Game(object):
                     winners = response['winners']
                     logging.debug(f'SUMMARY [{token}]: hand: {hand}')
                     for winner in winners:
-                        playerId = winner['playerId']
+                        winning_player = winner['playerId']
+                        winning_player = 'SCHNITZEL BOT' if winning_player == schnitzel_user else winning_player
                         chips = winner['chips']
                         best_hand = CardConvert.convert_cards(winner['bestHand'])
-                        logging.debug(f'[summary] winner {playerId}, chips: {chips}, best hand {best_hand}')
+                        logging.debug(f'[summary] winner {winning_player}, chips: {chips}, best hand {best_hand}')
                     break
                 elif response['type'] == 'bankrupt':
                     hand = response['hand']
