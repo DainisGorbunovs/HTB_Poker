@@ -105,7 +105,7 @@ def overallScore(community, hand, stakePercent):
 def decision(community, hand, bidAmount, currentMoney):
 
     if len(community) == 0:
-        return ["raise", max(round(bidAmount*1.1), 10)]
+        return ["raise", int(max(round(bidAmount*1.1), 10))]
 
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
@@ -113,7 +113,7 @@ def decision(community, hand, bidAmount, currentMoney):
     if score < 0.6:
         betValue = 0.2 * currentMoney
         if betValue > bidAmount:
-            return ["raise", betValue - bidAmount]
+            return ["raise", int(betValue - bidAmount)]
         else:
             if bidAmount == 0:
                 return ["check", 0]
@@ -122,7 +122,7 @@ def decision(community, hand, bidAmount, currentMoney):
     elif score < 1:
         betValue = 0.1 * currentMoney
         if betValue > bidAmount:
-            return ["raise", betValue - bidAmount]
+            return ["raise", int(betValue - bidAmount)]
         else:
             if bidAmount == 0:
                 return ["check", 0]

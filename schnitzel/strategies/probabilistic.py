@@ -1,12 +1,12 @@
 from ..game import Game
 from .decisionmaker import *
 from treys import Card
+import traceback
 
 
 class Probabilistic(object):
     def __init__(self):
         self.game = None
-        self.our_bet = 100
 
     def attach_game(self, game: Game):
         self.game = game
@@ -44,8 +44,15 @@ class Probabilistic(object):
 
         # community = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
         # hand = [Card.new('4s'), Card.new('Jc')]
-        bidAmount = int(latest_status['stake']) - int(schnizel_player['stake'])
+        bidAmount = max(int(latest_status['stake']) - int(schnizel_player['stake']), 10)
         currentMoney = schnizel_player['chips']
 
-        action, amount = decision(community, hand, bidAmount, currentMoney)
+
+        try:
+            action, amount = decision(community, hand, bidAmount, currentMoney)
+            print(f'Choosing {action}, and putting {amount}')
+        except Exception as e:
+            print(traceback.format_exc())
+            print('Decision issue')
+            return 'raise', bidAmount, False
         return action, amount, False
