@@ -109,9 +109,9 @@ def useSuperpower(superpowers, hand, community, stake, currentMoney):
         return "none"
     else:
         pScore = playerScore(community, hand)
-        if pScore < 0.2 and superpowers["spy"] != 0:
+        if pScore < 0.5 and superpowers["spy"] != 0:
             return "spy"
-        elif pScore < 0.5 and superpowers["leech"] != 0:
+        elif pScore < 1 and superpowers["leech"] != 0:
             return "leech"
         else:
             return "none"
