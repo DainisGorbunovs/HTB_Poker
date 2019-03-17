@@ -16,11 +16,11 @@ class Game(object):
         # Client login
         self.login_response = client.login(tournament=self.tournament)
         schnitzel_user = self.login_response['playerId']
+        print(f'We are {schnitzel_user}')
 
-
+        total_chips = None
         begin_hand = True
         while begin_hand:
-            total_chips = 0
             # Begin hand (repeated)
             auction_or_summary = client.receive_response()
 
@@ -70,7 +70,8 @@ class Game(object):
             roles = {v: k for k, v in status['roles'].items()}
             schnitzel_role = roles[schnitzel_user] if schnitzel_user in roles else None
 
-            total_chips = len(status['activePlayers']) * 1000
+            if total_chips is None:
+                total_chips = len(status['activePlayers']) * 1000
             # Bet sequence (repeated until check/call/fold/raise)
             bet_sequence = True
             while bet_sequence:
