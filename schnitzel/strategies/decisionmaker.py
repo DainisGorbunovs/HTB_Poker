@@ -105,7 +105,7 @@ def overallScore(community, hand, stakePercent):
 def decision(community, hand, bidAmount, currentMoney):
 
     if len(community) == 0:
-        return ["raise", round(bidAmount*1.1)]
+        return ["raise", max(round(bidAmount*1.1), 10)]
 
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
