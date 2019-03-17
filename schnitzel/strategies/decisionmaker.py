@@ -105,8 +105,8 @@ def auctionSuperpower(superpowers):
 
 
 def useSuperpower(superpowers, hand, community, stake, currentMoney):
-    if stake < 0.1 * currentMoney:
-        return "none"
+    if stake < 0.1 * currentMoney or len(community) < 3:
+        return None
     else:
         pScore = playerScore(community, hand)
         if pScore < 0.5 and superpowers["spy"] != 0:
@@ -114,7 +114,7 @@ def useSuperpower(superpowers, hand, community, stake, currentMoney):
         elif pScore < 1 and superpowers["leech"] != 0:
             return "leech"
         else:
-            return "none"
+            return None
 
 
 # method makes a decision (check/raise/call/fold) based on:
