@@ -1,8 +1,11 @@
 from treys import Evaluator
 from treys import Card
 import random
+from random import randint
 
 evaluator = Evaluator()
+
+MAXSCORE = 7462
 
 # Probabilities for Case 1 (fold / call)
 case1 = [[0.7, 1],
@@ -37,7 +40,12 @@ raisePercentage = [0.03,
                    0.2,
                    0.3]
 
-# Returns 0 for fold, 1 for check/call, 2 for raise
+allCards = [ "2s", "3s", "4s", "5s", "6s", "7s", "8s", "9s", "Ts", "Js", "Qs", "Ks", "As",
+                "2h", "3h", "4h", "5h", "6h", "7h", "8h", "9h", "Th", "Jh", "Qh", "Kh", "Ah",
+                "2d", "3d", "4d", "5d", "6d", "7d", "8d", "9d", "Td", "Jd", "Qd", "Kd", "Ad",
+                "2c", "3c", "4c", "5c", "6c", "7c", "8c", "9c", "Tc", "Jc", "Qc", "Kc", "Ac"]
+
+# Returns 0 for fold, 1 for check/call, 2 for raide
 def valueCompare(val, a):
     if val<a[0]:
         return 0
@@ -46,11 +54,43 @@ def valueCompare(val, a):
     else:
         return 2
 
-def raiseAmount(currentMoney, callAmount, i):
-    return round(min(currentMoney, callAmount + currentMoney * raisePercentage[i]))
+def raiseAmount(currentMoney, callAmount, raisePercent):
+    return round(min(currentMoney, callAmount + currentMoney * raisePercent))
 
 def callAmount(currentMoney, callAmount):
     return round(min(currentMoney, callAmount))
+
+def playerScore(community, hand):
+    return (evaluator.evaluate(community, hand) / MAXSCORE)
+
+def randCommunity(community):
+    if len(community) == 3:
+        hand = [Card.new(allCards[randint(0, 51)]), Card.new(allCards[randint(0, 51)])]
+    elif len(community) == 4:
+        hand = [Card.new(allCards[randint(0, 51)])]
+    else:
+        hand = []
+    return evaluator.evaluate(community, hand) / MAXSCORE
+
+def communityScore(community):
+    averageScore = 0
+    for i in range(10):
+        averageScore += 0.1 * randCommunity(community)
+    return averageScore
+
+def overallScore(community, hand, stakePercent):
+    if stakePercent < 0.03:
+        risk = 1.2
+    elif stakePercent < 0.1:
+        risk = 1
+    elif stakePercent < 0.3:
+        risk = 0.8
+    else:
+        risk = 0.6
+    #print("player score: %8f community score: %8f risk: %8f" % (playerScore(community, hand), communityScore(community), risk))
+    return playerScore(community, hand) / communityScore(community) * risk
+
+
 
 # method makes a decision (check/raise/call/fold) based on:
 #   @community, the cards on the board
@@ -62,60 +102,40 @@ def callAmount(currentMoney, callAmount):
 #   ["check", 0] if we should check
 #   ["call", value] if we should call (to the value specified)
 #   ["raise", value] if we should raise (to the value specified)
-def decision(community, hand, case, bidAmount, currentMoney):
-    score = evaluator.evaluate(community, hand)
-    randomVal = random.uniform(0, 1)
-    if score>5000:
-        i = 0
-    elif score>4000:
-        i = 1
-    elif score>2500:
-        i = 2
-    elif score>2100:
-        i = 3
-    elif score>1800:
-        i = 4
-    elif score>1300:
-        i = 5
-    elif score>400:
-        i = 6
-    elif score>200:
-        i = 7
-    else:
-        i = 8
+def decision(community, hand, bidAmount, currentMoney):
 
-    if case == 1:
-        result = valueCompare(randomVal, case1[i])
-        if result == 0:
-            return ["fold", 0]
-        elif result == 1:
-            callVal = callAmount(currentMoney, bidAmount)
-            if callVal == currentMoney:
-                return ["all-in", callVal]
-            else:
-                return ["call", callVal]
+    stakePercent = bidAmount / currentMoney
+    score = overallScore(community, hand, stakePercent)
+    print("The score for this hand is: %8f" % score)
+    if score < 0.5:
+        betValue = 0.2 * currentMoney
+        if betValue > bidAmount:
+            return ["raise", betValue - bidAmount]
         else:
-            raiseVal = raiseAmount(currentMoney, bidAmount, i)
-            if raiseVal == currentMoney:
-                return ["all-in", raiseVal]
-            else:
-                return ["raise", raiseVal]
+            return ["call", 0]
+    elif score < 1:
+        betValue = 0.1 * currentMoney
+        if betValue > bidAmount:
+            return ["raise", betValue - bidAmount]
+        else:
+            return ["call", 0]
     else:
-        result = valueCompare(randomVal, case2[i])
-        if result == 0:
-            return ["fold", 0]
-        elif result == 1:
+        betValue = 0.05 * currentMoney
+        if betValue > bidAmount:
             return ["check", 0]
         else:
-            raiseVal = raiseAmount(currentMoney, bidAmount, i)
-            if raiseVal == currentMoney:
-                return ["all-in", raiseVal]
-            else:
-                return ["raise", raiseVal]
+            return ["fold", 0]
+
+
 
 if __name__ == "__main__":
-    board = [Card.new('Ah'), Card.new('9d'), Card.new('7c')]
-    hand = [Card.new('9s'), Card.new('Ad')]
+    board = [Card.new('8h'), Card.new('2d'), Card.new('Tc')]
+    hand = [Card.new('2s'), Card.new('3c')]
 
-    dec = decision(board, hand, 1, 10, 100)
+    #print(evaluator.evaluate(board, hand))
+
+    #stakePercent = 0.1
+    #ovScore = overallScore(board, hand, stakePercent)
+    #print("Your overall score is: %10f" % ovScore)
+    dec = decision(board, hand, 100, 1000)
     print(dec[0], dec[1])
