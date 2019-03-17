@@ -10,9 +10,12 @@ class Game(object):
         self.strategy.attach_game(self)
         self.login_response = None
         self.tournament = tournament
+        self.client = None
+        self.status = []
 
     def run(self):
         client = TransactionClient(log_game=True)
+        self.client = client
         # Client login
         self.login_response = client.login(tournament=self.tournament)
         schnitzel_user = self.login_response['playerId']
@@ -26,6 +29,7 @@ class Game(object):
 
             if auction_or_summary is None:
                 print('We lost... the server closed the TCP channel.')
+                print('Possibly reached 100 hand limit....')
                 client.close()
                 return
 
@@ -72,6 +76,8 @@ class Game(object):
 
             if total_chips is None:
                 total_chips = len(status['activePlayers']) * 1000
+            self.status.append(status)
+
             # Bet sequence (repeated until check/call/fold/raise)
             bet_sequence = True
             while bet_sequence:
@@ -93,6 +99,7 @@ class Game(object):
                     if self.check_bankrupt(status) or self.check_win(status):
                         client.close()
                         return
+                    self.status.append(status)
                     continue
 
                 if bet_or_status['type'] == 'summary':
