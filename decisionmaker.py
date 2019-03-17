@@ -87,7 +87,7 @@ def overallScore(community, hand, stakePercent):
         risk = 0.8
     else:
         risk = 0.6
-    #print("player score: %8f community score: %8f risk: %8f" % (playerScore(community, hand), communityScore(community), risk))
+    print("player score: %8f community score: %8f risk: %8f" % (playerScore(community, hand), communityScore(community), risk))
     return playerScore(community, hand) / communityScore(community) * risk
 
 
@@ -107,30 +107,39 @@ def decision(community, hand, bidAmount, currentMoney):
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
     print("The score for this hand is: %8f" % score)
-    if score < 0.5:
+    if score < 0.6:
         betValue = 0.2 * currentMoney
         if betValue > bidAmount:
             return ["raise", betValue - bidAmount]
         else:
-            return ["call", 0]
+            if bidAmount == 0:
+                return ["check", 0]
+            else:
+                return ["call", 0]
     elif score < 1:
         betValue = 0.1 * currentMoney
         if betValue > bidAmount:
             return ["raise", betValue - bidAmount]
         else:
-            return ["call", 0]
+            if bidAmount == 0:
+                return ["check", 0]
+            else:
+                return ["call", 0]
     else:
         betValue = 0.05 * currentMoney
-        if betValue > bidAmount:
-            return ["check", 0]
+        if betValue >= bidAmount:
+            if bidAmount == 0:
+                return ["check", 0]
+            else:
+                return ["call", 0]
         else:
             return ["fold", 0]
 
 
 
 if __name__ == "__main__":
-    board = [Card.new('8h'), Card.new('2d'), Card.new('Tc')]
-    hand = [Card.new('2s'), Card.new('3c')]
+    board = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
+    hand = [Card.new('4s'), Card.new('Jc')]
 
     #print(evaluator.evaluate(board, hand))
 
