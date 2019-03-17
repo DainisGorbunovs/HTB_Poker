@@ -105,7 +105,7 @@ def auctionSuperpower(superpowers):
     elif superpowers["spy"] < 3:
         return ["spy", 4]
     else:
-        return ["none", 0]
+        return [None, 0]
 
 
 def useSuperpower(superpowers, hand, community, stake, currentMoney):

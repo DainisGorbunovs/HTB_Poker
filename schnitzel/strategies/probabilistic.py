@@ -11,9 +11,19 @@ class Probabilistic(object):
     def attach_game(self, game: Game):
         self.game = game
 
+    def get_superpowers(self) -> dict:
+        return self.game.superpowers
+
     # auction_response
     def superpower_bid(self):
-        return None, 0
+        action, coins = auctionSuperpower(self.get_superpowers())
+        return action, coins
+
+    def get_leeched(self):
+        return self.game.leeched
+
+    def get_spied(self):
+        return self.game.spied
 
     # bet_response
     def make_a_bet(self):
@@ -42,6 +52,12 @@ class Probabilistic(object):
                 card_name = 'T' + card_name[1]
             community.append(Card.new(card_name))
 
+        schnitzel_chips = self.game.get_schnitzel_chips()
+        use_superpower = useSuperpower(self.get_superpowers(), hand, community, int(latest_status['stake']), schnitzel_chips)
+        if use_superpower is not None:
+            self.game.superpowers[use_superpower] -= 1
+            return use_superpower, 0, False
+
         # community = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
         # hand = [Card.new('4s'), Card.new('Jc')]
         bidAmount = max(int(latest_status['stake']) - int(schnizel_player['stake']), 10)
@@ -49,6 +65,9 @@ class Probabilistic(object):
 
 
         try:
+            # community_with_spy = community + self.get_spied()
+            # hand_with_leech = hand + self.get_leeched()
+            # action, amount = decision(community_with_spy, hand_with_leech, bidAmount, currentMoney)
             action, amount = decision(community, hand, bidAmount, currentMoney)
             print(f'Choosing {action}, and putting {amount}')
         except Exception as e:
