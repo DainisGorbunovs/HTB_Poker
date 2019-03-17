@@ -32,7 +32,7 @@ class TransactionClient(object):
         print(f'Saved the game into file {filename}')
 
     # request_message is a dict (key = field name)
-    def send_request(self, request_message: dict) -> dict:
+    def send_request(self, request_message: dict, get_response: bool = True) -> dict or None:
         if self.log_game:
             self.message_log.append(('Schnitzel Bot', request_message))
         request_bytes = json.dumps(request_message).encode('utf-8')
@@ -42,7 +42,7 @@ class TransactionClient(object):
         self.sock.sendall(request_length_bytes)
         self.sock.sendall(request_bytes)
 
-        return self.receive_response()
+        return self.receive_response() if get_response else None
 
     def receive_response(self) -> dict or None:
         # Receive data from the server and shut down
@@ -118,4 +118,4 @@ class TransactionClient(object):
             # to raise by (excluding the chips required to call).
             response['stake'] = stake
 
-        return self.send_request(response)
+        return self.send_request(response, False)
