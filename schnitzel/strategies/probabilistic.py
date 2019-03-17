@@ -28,9 +28,22 @@ class Probabilistic(object):
         pocket_cards = latest_status['pocketCards']
         community_cards = latest_status['communityCards']
 
+        hand = []
+        community = []
+        for pocket_card in pocket_cards:
+            card_name = pocket_card['rank'].upper()[0] + pocket_card['suit'][0]
+            if card_name[0] == '1':
+                card_name = 'T' + card_name[1]
+            hand.append(Card.new(card_name))
 
-        community = [Card.new('Ah'), Card.new('2d'), Card.new('Tc')]
-        hand = [Card.new('As'), Card.new('3c')]
+        for community_card in community_cards:
+            card_name = community_card['rank'].upper()[0] + community_card['suit'][0]
+            if card_name[0] == '1':
+                card_name = 'T' + card_name[1]
+            community.append(Card.new(card_name))
+
+        # community = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
+        # hand = [Card.new('4s'), Card.new('Jc')]
         bidAmount = int(latest_status['stake']) - int(schnizel_player['stake'])
         currentMoney = schnizel_player['chips']
 

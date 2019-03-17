@@ -23,13 +23,16 @@ class Game(object):
 
         total_chips = None
         begin_hand = True
+        token = None
         while begin_hand:
             # Begin hand (repeated)
             auction_or_summary = client.receive_response()
 
             if auction_or_summary is None:
-                print('We lost... the server closed the TCP channel.')
-                print('Possibly reached 100 hand limit....')
+                if token == 99:
+                    print('Reached 100 hand limit... the server closed the TCP channel')
+                else:
+                    print('We lost?... the server closed the TCP channel.')
                 client.close()
                 return
 
