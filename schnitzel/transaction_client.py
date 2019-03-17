@@ -29,6 +29,8 @@ class TransactionClient(object):
         with open(filename, 'w') as outfile:
             json.dump(self.message_log, outfile)
 
+        print(f'Saved the game into file {filename}')
+
     # request_message is a dict (key = field name)
     def send_request(self, request_message: dict) -> dict:
         if self.log_game:
@@ -108,7 +110,7 @@ class TransactionClient(object):
 
             # True to allow use of reserve chips or super powers if
             # the main counts are insufficient
-            'use_reserve': use_reserve
+            'useReserve': use_reserve
         }
 
         if action == 'raise':
