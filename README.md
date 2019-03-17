@@ -1,5 +1,13 @@
 # HTB_Poker
-Hack The Burgh 2019: Poker game Squarepoint
+Devpost: [Schnitzel Pokerman](https://devpost.com/software/schnitzel-pokerman)
+
+Hack The Burgh 2019: Poker game Squarepoint.
+
+Created by:
+* [Dainis Gorbunovs](https://github.com/DainisGorbunovs) - [LinkedIn](https://www.linkedin.com/in/dainisgorbunovs/)
+* [Valentine Dragan](https://github.com/ValntinDragan) - [LinkedIn](https://www.linkedin.com/in/valentinadriandragan/)
+* [Ilja Tscharikow](https://github.com/Ilja2307) - [LinkedIn](https://www.linkedin.com/in/ilja-tscharikow/)
+* [Minh Tri Pham](https://github.com/MinhTri-Pham)
 
 ## Create, and use the virtual environment
 
