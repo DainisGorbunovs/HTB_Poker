@@ -29,6 +29,8 @@ class TransactionClient(object):
         with open(filename, 'w') as outfile:
             json.dump(self.message_log, outfile)
 
+        print(f'Saved the game into file {filename}')
+
     # request_message is a dict (key = field name)
     def send_request(self, request_message: dict) -> dict:
         if self.log_game:
@@ -94,7 +96,7 @@ class TransactionClient(object):
 
     # server replies back, if we use a superpower
     def bet_response(self, token: int = 0, action: str = 'fold',
-                     stake: int = None, use_reserve: bool = False):
+                     stake: int = 0, use_reserve: bool = False) -> dict or None:
         response = {
             # Always “bet_response”
             'type': 'bet_response',
@@ -108,7 +110,7 @@ class TransactionClient(object):
 
             # True to allow use of reserve chips or super powers if
             # the main counts are insufficient
-            'use_reserve': use_reserve
+            'useReserve': use_reserve
         }
 
         if action == 'raise':
@@ -116,6 +118,4 @@ class TransactionClient(object):
             # to raise by (excluding the chips required to call).
             response['stake'] = stake
 
-        # if action is a superpower
-        if action in ['spy', 'seer', 'leech']:
-            return self.send_request(response)
+        return self.send_request(response)
