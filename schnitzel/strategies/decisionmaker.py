@@ -60,7 +60,7 @@ def overallScore(community, hand, stakePercent):
     else:
         risk = 0.6
     print("player score: %8f community score: %8f risk: %8f" % (playerScore(community, hand), communityScore(community), risk))
-    return playerScore(community, hand) / communityScore(community) * risk
+    return playerScore(community, hand) / communityScore(community)
 
 
 def auctionSuperpower(superpowers):
@@ -110,8 +110,17 @@ def decision(community, hand, bidAmount, currentMoney):
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
     print("The score for this hand is: %8f" % score)
-    if score < 0.45:
-        betValue = 0.2 * currentMoney
+    if score < 0.4:
+        betValue = 0.3 * currentMoney
+        if betValue > bidAmount:
+            return ["raise", int(betValue - bidAmount)]
+        else:
+            if bidAmount == 0:
+                return ["check", 0]
+            else:
+                return ["call", 0]
+    elif score < 0.6:
+        betValue = 0.1 * currentMoney
         if betValue > bidAmount:
             return ["raise", int(betValue - bidAmount)]
         else:
@@ -120,9 +129,9 @@ def decision(community, hand, bidAmount, currentMoney):
             else:
                 return ["call", 0]
     elif score < 0.9:
-        betValue = 0.1 * currentMoney
+        betValue = 0.1 * 0.75 * currentMoney
         if betValue > bidAmount:
-            return ["raise", int(betValue - bidAmount)]
+            return ["raise", int((betValue - bidAmount))]
         else:
             if bidAmount == 0:
                 return ["check", 0]
