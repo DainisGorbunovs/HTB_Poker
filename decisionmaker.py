@@ -104,6 +104,9 @@ def overallScore(community, hand, stakePercent):
 #   ["raise", value] if we should raise (to the value specified)
 def decision(community, hand, bidAmount, currentMoney):
 
+    if len(community) == 0:
+        return ["raise", round(bidAmount*1.1)]
+
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
     print("The score for this hand is: %8f" % score)
@@ -146,5 +149,5 @@ if __name__ == "__main__":
     #stakePercent = 0.1
     #ovScore = overallScore(board, hand, stakePercent)
     #print("Your overall score is: %10f" % ovScore)
-    dec = decision(board, hand, 100, 1000)
+    dec = decision(board, hand, 5, 1000)
     print(dec[0], dec[1])
