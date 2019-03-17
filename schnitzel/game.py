@@ -13,6 +13,8 @@ class Game(object):
         self.client = None
         self.status = []
         self.superpowers = {}
+        self.leeched = []
+        self.spied = []
         self.strategy.attach_game(self)
 
     def run(self):
@@ -71,6 +73,8 @@ class Game(object):
             auction_result = client.auction_response(token, superpower_type, superpower_bid)
             won_superpower = auction_result['superPower'] if auction_result['superPower'] is not None else 'none'
             logging.debug(f'[AUCTION_RESULT] We won: {won_superpower}.')
+            self.leeched = []
+            self.spied = []
 
             # one status per action of any player, or card dealt
             # Bet sequence (repeated until check/call/fold/raise)
@@ -101,6 +105,10 @@ class Game(object):
                         superpower_response = client.receive_response()
                         card = CardConvert.convert_cards([superpower_response['card']])
                         logging.debug(f'SUPER_POWER [{token}]: card: {card}')
+                        if action == 'leech':
+                            self.leeched.append(card)
+                        elif action == 'spy':
+                            self.spied.append(card)
                 elif response['type'] == 'summary':
                     hand = response['hand']
                     winners = response['winners']
