@@ -5,21 +5,29 @@ from . import TransactionClient
 
 
 class Game(object):
-    def __init__(self, strategy: object):
+    def __init__(self, strategy: object, tournament: bool = False):
         self.strategy = strategy
         self.strategy.attach_game(self)
         self.login_response = None
+        self.tournament = tournament
 
     def run(self):
         client = TransactionClient(log_game=True)
         # Client login
-        self.login_response = client.login()
+        self.login_response = client.login(tournament=self.tournament)
         schnitzel_user = self.login_response['playerId']
+
 
         begin_hand = True
         while begin_hand:
+            total_chips = 0
             # Begin hand (repeated)
             auction_or_summary = client.receive_response()
+
+            if auction_or_summary is None:
+                print('We lost... the server closed the TCP channel.')
+                client.close()
+                return
 
             # End bet sequence
             if auction_or_summary['type'] == 'summary':
@@ -40,6 +48,11 @@ class Game(object):
             # TODO: should we expect more messages from the server?
             status = client.receive_response()
 
+            if status['type'] == 'bankrupt':
+                print('We lost... bankrupt')
+                client.close()
+                return
+
             # if we won or lost, then just leave
             if self.check_bankrupt(status) or self.check_win(status):
                 client.close()
@@ -57,11 +70,16 @@ class Game(object):
             roles = {v: k for k, v in status['roles'].items()}
             schnitzel_role = roles[schnitzel_user] if schnitzel_user in roles else None
 
+            total_chips = len(status['activePlayers']) * 1000
             # Bet sequence (repeated until check/call/fold/raise)
             bet_sequence = True
             while bet_sequence:
                 bet_or_status = client.receive_response()
 
+                if bet_or_status['type'] == 'bankrupt':
+                    print('We lost... bankrupt')
+                    client.close()
+                    return
                 if bet_or_status['type'] == 'status':
                     status = bet_or_status
                     schnitzel_status = None
@@ -94,7 +112,8 @@ class Game(object):
                 if action in ['spy', 'seer', 'leech']:
                     superpower_response = client.receive_response()
 
-            print(f'Finished hand {token}')
+            schnitzel_chips = schnitzel_status['chips']
+            print(f'Finished hand {token}, chips: {schnitzel_chips} / {total_chips}')
 
         client.close()
 
