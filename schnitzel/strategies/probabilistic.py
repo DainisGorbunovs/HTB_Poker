@@ -16,8 +16,8 @@ class Probabilistic(object):
 
     # auction_response
     def superpower_bid(self):
-
-        return None, 0
+        action, coins = auctionSuperpower(self.get_superpowers())
+        return action, coins
 
     # bet_response
     def make_a_bet(self):
@@ -45,6 +45,11 @@ class Probabilistic(object):
             if card_name[0] == '1':
                 card_name = 'T' + card_name[1]
             community.append(Card.new(card_name))
+
+        schnitzel_chips = self.game.get_schnitzel_chips()
+        use_superpower = useSuperpower(self.get_superpowers(), hand, community, int(latest_status['stake']), schnitzel_chips)
+        if use_superpower is not None:
+            return use_superpower, 0, False
 
         # community = [Card.new('Jh'), Card.new('Ad'), Card.new('3s')]
         # hand = [Card.new('4s'), Card.new('Jc')]

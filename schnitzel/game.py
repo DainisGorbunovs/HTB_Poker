@@ -69,6 +69,8 @@ class Game(object):
             # Make a bid for a superpower
             superpower_type, superpower_bid = self.strategy.superpower_bid()
             auction_result = client.auction_response(token, superpower_type, superpower_bid)
+            won_superpower = auction_result['superPower'] if auction_result['superPower'] is not None else 'none'
+            logging.debug(f'[AUCTION_RESULT] We won: {won_superpower}.')
 
             # one status per action of any player, or card dealt
             # Bet sequence (repeated until check/call/fold/raise)
@@ -95,7 +97,7 @@ class Game(object):
 
                     # if action is a superpower
                     if action in ['spy', 'seer', 'leech']:
-                        logging.debug(f'Received SuperPower repsonse: {token}')
+                        logging.debug(f'Received SuperPower response: {token}')
                         superpower_response = client.receive_response()
                         card = CardConvert.convert_cards([superpower_response['card']])
                         logging.debug(f'SUPER_POWER [{token}]: card: {card}')
