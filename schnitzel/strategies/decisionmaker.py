@@ -101,7 +101,10 @@ def useSuperpower(superpowers, hand, community, stake, currentMoney):
 def decision(community, hand, bidAmount, currentMoney):
 
     if len(community) == 0:
-        return ["raise", int(max(round(bidAmount*1.1), 10))]
+        if (bidAmount != 0):
+            return ["call", 0]
+        else:
+            return ["check", 0]
 
     stakePercent = bidAmount / currentMoney
     score = overallScore(community, hand, stakePercent)
