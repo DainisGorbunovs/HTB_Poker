@@ -31,6 +31,7 @@ def playerScore(community, hand):
     if len(community) + len(hand) > 7:
         average = 0.5 * (evaluator.evaluate(community[:2], hand)) / MAXSCORE
         average += 0.5 * (evaluator.evaluate(community[2:], hand)) / MAXSCORE
+        return average
     else:
         return (evaluator.evaluate(community, hand) / MAXSCORE)
 
