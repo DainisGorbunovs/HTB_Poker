@@ -61,7 +61,11 @@ def callAmount(currentMoney, callAmount):
     return round(min(currentMoney, callAmount))
 
 def playerScore(community, hand):
-    return (evaluator.evaluate(community, hand) / MAXSCORE)
+    if len(community) + len(hand) > 7:
+        average = 0.5 * (evaluator.evaluate(community[:2], hand)) / MAXSCORE
+        average += 0.5 * (evaluator.evaluate(community[2:], hand)) / MAXSCORE
+    else:
+        return (evaluator.evaluate(community, hand) / MAXSCORE)
 
 def randCommunity(community):
     if len(community) == 3:
